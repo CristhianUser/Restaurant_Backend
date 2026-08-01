@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  # 🐘 Tu Base de Datos PostgreSQL
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres_restaurante
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=postgresql220703
+      - POSTGRES_DB=restaurante_db
