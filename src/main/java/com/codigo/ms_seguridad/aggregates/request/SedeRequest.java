@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 public class SedeRequest {
     private String distrito;
+    private String departamento;
+    private String nombre;
     private String ubicacion;
     private MultipartFile referencia;
 }

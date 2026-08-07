@@ -1,0 +1,33 @@
+package com.codigo.ms_seguridad.controller.Admin;
+
+import com.codigo.ms_seguridad.aggregates.request.SedeRequest;
+import com.codigo.ms_seguridad.aggregates.response.SedeResponse;
+import com.codigo.ms_seguridad.service.SedeService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RequestMapping("/api/admin")
+@RestController
+@RequiredArgsConstructor
+public class SedeController {
+
+    public final SedeService sedeService;
+
+    @GetMapping("/all-sede")
+    private List<SedeResponse> allSedes(@RequestParam("nombre") String nombreSede){
+        return sedeService.listSedes(nombreSede);
+    }
+
+    @PostMapping("/create-sede")
+    private SedeResponse createSede(@ModelAttribute SedeRequest sedeRequest){
+        return sedeService.createSede(sedeRequest);
+    }
+
+    @GetMapping ("/sede/{codigo}")
+    private SedeResponse findSede(@PathVariable("codigo") String codigo){
+        return sedeService.findByCodigo(codigo);
+    }
+
+}

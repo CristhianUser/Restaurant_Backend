@@ -17,8 +17,9 @@ public class Sede {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "cod_sede",unique = true)
-    private String codigoUnico = UUID.randomUUID().toString();
+    private String codigoUnico = UUID.randomUUID().toString().replace("-","").substring(0, 10);
     private String nombre;
+    private String departamento;
     private String distrito;
     private String ubicacion;
     private String fotoReferencia;

@@ -61,7 +61,9 @@ public class SedeServiceImpl implements SedeService {
 
     Sede mapSedeToRequest(SedeRequest sedeRequest){
         Sede sedeMapeada = new Sede();
+        sedeMapeada.setDepartamento(sedeRequest.getDepartamento());
         sedeMapeada.setDistrito(sedeRequest.getDistrito());
+        sedeMapeada.setNombre(sedeRequest.getNombre());
         sedeMapeada.setUbicacion(sedeRequest.getUbicacion());
         sedeMapeada.setFotoReferencia(mapStringtoFile(sedeRequest.getReferencia()));
         sedeMapeada.setNombre(nombreSede(sedeRequest.getDistrito(), sedeMapeada.getCodigoUnico()));
@@ -70,7 +72,9 @@ public class SedeServiceImpl implements SedeService {
 
     SedeResponse mapResponseToSed(Sede sede){
         SedeResponse mapResponse = new SedeResponse();
+        mapResponse.setDepartamento(sede.getDepartamento());
         mapResponse.setDistrito(sede.getDistrito());
+        mapResponse.setNombre(sede.getNombre());
         mapResponse.setCodigo(sede.getCodigoUnico());
         mapResponse.setUbicacion(sede.getUbicacion());
         mapResponse.setFoto(sede.getFotoReferencia());
