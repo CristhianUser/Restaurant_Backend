@@ -6,9 +6,8 @@ import com.codigo.ms_seguridad.aggregates.response.RestauranteResponse;
 import java.util.List;
 
 public interface RestauranteService {
-    RestauranteResponse createRestaurante(String codigoSede,RestauranteRequest restauranteRequest);
-    List<RestauranteResponse> listRestaurantes(String nombreRestaurante);
-    RestauranteResponse findByNombreResturante(String nombreRestaurante);
-    RestauranteResponse updateRestaurante(String nombreRestaurante,RestauranteRequest restauranteRequest);
-    void DeleteByCodigoUnicoDelRestaurante(String codigoUnicoRestaurante);
+    List<RestauranteResponse> listRestaurantes(String filtro);
+    RestauranteResponse getRestaurante();
+//  RestauranteResponse getResponse(String codigoRestaurante);
+    void eliminarRestaurante(String codigoRestaurante);
 }

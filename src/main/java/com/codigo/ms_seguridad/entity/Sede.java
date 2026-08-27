@@ -18,12 +18,9 @@ public class Sede {
     private Long id;
     @Column(name = "cod_sede",unique = true)
     private String codigoUnico = UUID.randomUUID().toString().replace("-","").substring(0, 10);
-    private String nombre;
     private String departamento;
     private String distrito;
-    private String ubicacion;
-    private String fotoReferencia;
-    @OneToMany(mappedBy = "sede")
+    @OneToMany(mappedBy = "sede", cascade = CascadeType.ALL)
     private Set<Restaurante> restaurantes = new HashSet<>();
 
     public void AsociarRestaurante(Restaurante restaurante){

@@ -12,4 +12,5 @@ public interface ProductoService {
     ProductMasterResponse updateByIdProducto(String codigo, ProductMasterRequest productMasterRequest);
     List<ProductMasterResponse> listProductos(String nombreProducto);
     void deleteById(Long id);
+    void deletteByCodigoProducto(String codigo);
 }

@@ -10,9 +10,11 @@ import java.util.Set;
 @Getter
 public class RestauranteResponse {
     private String codigo;
+    private String sedeRestaurante;
+    private String rucRestaurante;
     private String nombreRestaurante;
-    private String ubicacion;
-    private String ubicacionUrl;
-    private String imagenReferencia;
-    private Set<ProductMenuResponse> productMenuResponseSet = new HashSet<>();
+    private String fotoRestaurante;
+    private String ubicacionRestaurante;
+    private Set<DataResponse> usuariosReponsResponses = new HashSet<>();
+    private Set<ProductMenuResponse> productMenuResponses= new HashSet<>();
 }

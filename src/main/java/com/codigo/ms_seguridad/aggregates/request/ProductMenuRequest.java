@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductMenuRequest {
+    private String codigo;
     private Double precioBase;
     private Double descuento;
     private Double precioFinal;

@@ -1,5 +1,7 @@
 package com.codigo.ms_seguridad.service;
 
+import com.codigo.ms_seguridad.aggregates.request.RestauranteMasterRequest;
+import com.codigo.ms_seguridad.aggregates.request.RestauranteRequest;
 import com.codigo.ms_seguridad.aggregates.request.SignInRequest;
 import com.codigo.ms_seguridad.aggregates.request.SignUpRequest;
 import com.codigo.ms_seguridad.aggregates.response.SignInResponse;
@@ -13,7 +15,7 @@ public interface AuthenticationService {
     //Registrar Admin
     Usuario signUpAdmin(SignUpRequest signUpRequest);
     //Registrar GestorRestaurante
-    Usuario singUpGestorRestaurante(SignUpRequest signUpRequest);
+    void singUpGestorRestaurante(RestauranteMasterRequest restauranteMasterRequest);
     //Registrar GestorVentas
     Usuario singUpGestorVentas(SignUpRequest signUpRequest);
     List<Usuario> todos();

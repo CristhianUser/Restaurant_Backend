@@ -10,6 +10,7 @@ import com.codigo.ms_seguridad.service.ProductoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
@@ -97,6 +98,12 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     public void deleteById(Long id) {
         productoRepository.deleteById(id);
+    }
+
+    @Transactional
+    @Override
+    public void deletteByCodigoProducto(String codigo) {
+        productoRepository.deleteByCodigo(codigo);
     }
 
     Categoria buscarCategoriaById(Long id){

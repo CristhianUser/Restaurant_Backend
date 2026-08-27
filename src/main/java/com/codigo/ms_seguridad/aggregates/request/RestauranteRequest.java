@@ -7,7 +7,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @Getter
 public class RestauranteRequest {
-    private String ubicacion;
-    private String ubicacionUrl;
+    private String departamento;
+    private String distrito;
+    private String rucRestaurante;
+    private String nombreRestaurante;
+    private String ubicacionRestaurante;
     private MultipartFile fotoRestaurante;
 }

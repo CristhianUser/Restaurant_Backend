@@ -34,7 +34,7 @@ public class Usuario implements UserDetails {
 
     @ManyToOne
     @JoinColumn(name = "restaurante_id")
-    private Restaurante restauranteByUsuario;
+    private Restaurante restaurante;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "usuario_rol",

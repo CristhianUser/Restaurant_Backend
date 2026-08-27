@@ -1,15 +1,17 @@
 package com.codigo.ms_seguridad.service.impl;
 
 import com.codigo.ms_seguridad.aggregates.constants.Constants;
+import com.codigo.ms_seguridad.aggregates.request.RestauranteMasterRequest;
+import com.codigo.ms_seguridad.aggregates.request.RestauranteRequest;
 import com.codigo.ms_seguridad.aggregates.request.SignInRequest;
 import com.codigo.ms_seguridad.aggregates.request.SignUpRequest;
 import com.codigo.ms_seguridad.aggregates.response.DataResponse;
 import com.codigo.ms_seguridad.aggregates.response.SignInResponse;
 import com.codigo.ms_seguridad.config.ExceptionMessage;
-import com.codigo.ms_seguridad.entity.Rol;
-import com.codigo.ms_seguridad.entity.Role;
-import com.codigo.ms_seguridad.entity.Usuario;
+import com.codigo.ms_seguridad.entity.*;
+import com.codigo.ms_seguridad.repository.RestauranteRepository;
 import com.codigo.ms_seguridad.repository.RolRepository;
+import com.codigo.ms_seguridad.repository.SedeRepository;
 import com.codigo.ms_seguridad.repository.UsuarioRepository;
 import com.codigo.ms_seguridad.service.AuthenticationService;
 import com.codigo.ms_seguridad.service.JwtService;
@@ -22,8 +24,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +36,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
+    private final SedeRepository sedeRepository;
+    private final RestauranteRepository restauranteRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UsuarioService usuarioService;
@@ -62,14 +68,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return usuarioRepository.save(usuario);
     }
 
+    @Transactional
     @Override
-    public Usuario singUpGestorRestaurante(SignUpRequest signUpRequest) {
-        if(buscarUsuarioByEmail(signUpRequest.getEmail())){
-            throw new ExceptionMessage("El email ya se encuentra registrado con otra cuenta");
+    public void singUpGestorRestaurante(RestauranteMasterRequest restauranteMasterRequest) {
+
+        boolean emailPresent = usuarioRepository.existsByEmail(restauranteMasterRequest.getSignUpRequest().getEmail());
+
+        boolean rucPresent = restauranteRepository.existsByRucRestaurante(restauranteMasterRequest.getRestauranteRequest().getRucRestaurante());
+
+        if (rucPresent || emailPresent){
+            throw new ExceptionMessage("El ruc o el email ya se encuentra registrado !!!");
         }
-        Usuario usuario = getUsuarioEntity(signUpRequest);
+
+        Usuario usuario = getUsuarioEntity(restauranteMasterRequest.getSignUpRequest());
         usuario.setRoles(Collections.singleton(getRoles(Role.GESTOR_RESTAURANTE)));
-        return usuarioRepository.save(usuario);
+        Sede sede = getSede(restauranteMasterRequest.getRestauranteRequest().getDepartamento());
+        Restaurante restaurante = getRestaurante(
+                    restauranteMasterRequest.getRestauranteRequest().getRucRestaurante(),
+                    restauranteMasterRequest.getRestauranteRequest().getNombreRestaurante(),
+                    restauranteMasterRequest.getRestauranteRequest().getUbicacionRestaurante(),
+                    restauranteMasterRequest.getRestauranteRequest().getDistrito()
+                );
+        sede.AsociarRestaurante(restaurante);
+        restaurante.vincularUsuario(usuario);
+        sedeRepository.save(sede);
     }
 
     @Override
@@ -136,13 +158,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         //generar el access
         String newAccess = jwtService.generateToken(userDetails,usuario);
+        List<String> roles = usuario.getRoles().stream().map(rol -> rol.getNombreRol()).collect(Collectors.toList());
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", usuario.getId());
+        claims.put("roles", roles);
+
+        String newRefresh = jwtService.generateRefreshToken(claims,userDetails);
         DataResponse dataResponse = DataResponse.builder()
-                .nombres(usuario.getNombres()+" "+usuario.getApellidos()).email(usuario.getEmail()).roles(usuario.getRoles().stream().map(rol -> rol.getNombreRol()).toList()).build();
+                .nombres(usuario.getNombres()+" "+usuario.getApellidos()).email(usuario.getEmail()).roles(roles).build();
 
 
         return SignInResponse.builder()
                 .accessToken(newAccess)
-                .refreshToken(refreshToken)
+                .refreshToken(newRefresh)
                 .dataResponse(dataResponse)
                 .build();
     }
@@ -173,4 +202,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return rolRepository.findByNombreRol(rolBuscado.name())
                 .orElseThrow(() -> new RuntimeException("Error el rol no exixte: " + rolBuscado.name()));
     }
+
+    public Restaurante getRestaurante(String rucRestaurante, String nombreRestaurante, String ubicacionRestaurante, String distritoRestaurante){
+        Restaurante restauranteEntity = new Restaurante();
+        restauranteEntity.setRucRestaurante(rucRestaurante);
+        restauranteEntity.setNombreRestaurante(nombreRestaurante);
+        restauranteEntity.setUbicacionRestaurante(ubicacionRestaurante);
+        restauranteEntity.setDistrito(distritoRestaurante);
+        return  restauranteEntity;
+    }
+
+    public Sede getSede(String departamento){
+        Sede sedeEntity = new Sede();
+        sedeEntity.setDepartamento(departamento);
+        return sedeEntity;
+    }
+
 }

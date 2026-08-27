@@ -20,23 +20,5 @@ public class MenuController {
     private final RestauranteService restauranteService;
     private final SedeService sedeService;
 
-    @GetMapping("sedes")
-    private ResponseEntity<List<SedeResponse>> responseList(@RequestParam String nombreSede){
-        List<SedeResponse> sedeResponses = sedeService.listSedes(nombreSede);
-        return ResponseEntity.ok(sedeResponses);
-    }
-
-    @GetMapping("sede/{codigoSede}/restaurantes")
-    private ResponseEntity<SedeResponse> SedeRestaurantes(@PathVariable String codigoSede){
-        SedeResponse sedeResponse = sedeService.findByCodigo(codigoSede);
-        return ResponseEntity.ok(sedeResponse);
-    }
-
-    @GetMapping("restaurante/{nomnbreRestaurante}/menu")
-    private ResponseEntity<RestauranteResponse> MenuRestaurante(@PathVariable String nombreRestaurante){
-        RestauranteResponse restauranteResponse = restauranteService.findByNombreResturante(nombreRestaurante);
-        return ResponseEntity.ok(restauranteResponse);
-    }
-
 
 }

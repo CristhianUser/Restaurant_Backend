@@ -1,8 +1,6 @@
 package com.codigo.ms_seguridad.controller;
 
-import com.codigo.ms_seguridad.aggregates.request.RefreshRequest;
-import com.codigo.ms_seguridad.aggregates.request.SignInRequest;
-import com.codigo.ms_seguridad.aggregates.request.SignUpRequest;
+import com.codigo.ms_seguridad.aggregates.request.*;
 import com.codigo.ms_seguridad.aggregates.response.SignInResponse;
 import com.codigo.ms_seguridad.entity.Usuario;
 import com.codigo.ms_seguridad.service.AuthenticationService;
@@ -34,6 +32,11 @@ public class AuthenticationController {
     @PostMapping("/signupadmin")
     public ResponseEntity<Usuario> signUpUAdmin(@RequestBody SignUpRequest signUpRequest){
         return ResponseEntity.ok(authenticationService.signUpAdmin(signUpRequest));
+    }
+
+    @PostMapping("/signupRestaurant")
+    public void signUpRestaurant(@RequestBody RestauranteMasterRequest restauranteMasterRequest){
+        authenticationService.singUpGestorRestaurante(restauranteMasterRequest);
     }
 
     @GetMapping("/all")

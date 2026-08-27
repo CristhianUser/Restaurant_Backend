@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface SedeRepository extends JpaRepository<Sede, Long> {
     Optional<Sede> findByCodigoUnico(String codigoUnico);
-    List<Sede> findByNombreContainingIgnoreCase(String codigoUnico);
+    List<Sede> findByDepartamentoContainingIgnoreCaseOrDistritoContainingIgnoreCase(String departamento, String distrito);
 }

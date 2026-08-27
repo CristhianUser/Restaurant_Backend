@@ -8,4 +8,5 @@ import java.util.List;
 public interface ProductoRepository extends JpaRepository<ProductoMaster, Long> {
     ProductoMaster findByCodigo(String UUID);
     List<ProductoMaster> findByNombreContainingIgnoreCase(String nombreProducto);
+    void deleteByCodigo(String codigo);
 }

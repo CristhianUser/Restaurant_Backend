@@ -27,7 +27,7 @@ public class MenuProducto {
     private Double precioFinal;
     private String descripcion;
 
-    public void vincularConProductoCatalogo(ProductoMaster producto){
+    public void mapeoDatos(ProductoMaster producto){
         this.setProducto(producto);
         this.setFoto(producto.getFoto());
         this.setCategoria(producto.getCategoria().getNombreCategoria());

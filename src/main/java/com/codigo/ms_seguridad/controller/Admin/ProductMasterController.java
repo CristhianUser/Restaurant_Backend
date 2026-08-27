@@ -37,7 +37,7 @@ public class ProductMasterController {
         return ResponseEntity.ok(productMasterResponse);
     }
 
-    @PostMapping("catalogo-productos/crear-producto")
+    @PostMapping("/catalogo-productos/crear-producto")
     public ResponseEntity<ProductMasterResponse> createProducto(@ModelAttribute ProductMasterRequest productMasterRequest){
         ProductMasterResponse productMasterResponse = productoService.createProducto(productMasterRequest);
         System.out.println("Categoría recibida: " + productMasterRequest.getNombreCategoria());
@@ -46,14 +46,14 @@ public class ProductMasterController {
         return ResponseEntity.ok(productMasterResponse);
     }
 
-    @PostMapping("{codigoProducto}/actualizar")
+    @PostMapping("/{codigoProducto}/actualizar")
     public ResponseEntity<ProductMasterResponse> updateProducto(@PathVariable String codigoProducto, @RequestBody ProductMasterRequest productMasterRequest){
         ProductMasterResponse productMasterResponse = productoService.updateByIdProducto(codigoProducto, productMasterRequest);
         return ResponseEntity.ok(productMasterResponse);
     }
 
-    @DeleteMapping("eliminar-producto/{id}")
-    public void deleteProducto(@PathVariable Long idProducto){
-        productoService.deleteById(idProducto);
+    @DeleteMapping("/eliminar/{codigo}")
+    public void deleteProductoByCodigo(@PathVariable String codigo){
+        productoService.deletteByCodigoProducto(codigo);
     }
 }

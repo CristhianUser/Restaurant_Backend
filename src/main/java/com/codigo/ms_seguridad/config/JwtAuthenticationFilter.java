@@ -77,7 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         System.out.println("DEBUG SECURITY - Usuario: " + userEmail + " | Autoridades en Contexto: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-        //COntinuar con el resto de filtros
+        //Continuar con el resto de filtros
         filterChain.doFilter(request,response);
     }
 }

@@ -2,6 +2,7 @@ package com.codigo.ms_seguridad.service.impl;
 
 import com.codigo.ms_seguridad.aggregates.request.ProductMenuRequest;
 import com.codigo.ms_seguridad.aggregates.response.ProductMenuResponse;
+import com.codigo.ms_seguridad.config.ExceptionMessage;
 import com.codigo.ms_seguridad.entity.MenuProducto;
 import com.codigo.ms_seguridad.entity.ProductoMaster;
 import com.codigo.ms_seguridad.entity.Restaurante;
@@ -16,6 +17,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class MenuProductoServiceImpl implements MenuProductoService {
@@ -26,64 +30,58 @@ public class MenuProductoServiceImpl implements MenuProductoService {
     private final UsuarioRepository usuarioRepository;
 
     @Override
-    public ProductMenuResponse agregarMenu(String codigoProductoCatalogo, ProductMenuRequest productMenuRequest) {
-        ProductoMaster productoCatalogo = productoRepository.findByCodigo(codigoProductoCatalogo);
-        MenuProducto menuProducto = new MenuProducto();
-        menuProducto.vincularConProductoCatalogo(productoCatalogo);
-        Restaurante restauranteByUsuario = restauranteByEmailUsuario();
-        restauranteByUsuario.agregarAlMenu(menuProducto);
-        menuProducto.setPrecioBase(productMenuRequest.getPrecioBase());
-        menuProducto.setDescuento(productMenuRequest.getDescuento());
-        menuProducto.setPrecioFinal(calculoPrecioFinal(productMenuRequest.getPrecioBase(), productMenuRequest.getDescuento()));
-        menuProducto.setDescripcion(productMenuRequest.getDescripcion());
-        menuProductoRepository.save(menuProducto);
-        return getResponseByEntity(menuProducto);
+    public List<ProductMenuResponse> listProductMenuResponses(String producto, String categoria) {
+        boolean isFilter = producto.trim() != null || categoria.trim() != null;
+        List<ProductMenuResponse> menuResponses = isFilter ?
+                menuProductoRepository.findByProducto_NombreContainingIgnoreCaseOrCategoriaContainingIgnoreCase(producto, categoria).stream().map(this::getMenuResponse).collect(Collectors.toList())
+                : menuProductoRepository.findAll().stream().map(this::getMenuResponse).collect(Collectors.toList());
+
+        return menuResponses;
     }
 
     @Override
-    public ProductMenuResponse actualizarMenu(String codigoMenu) {
-        return null;
-    }
+    public ProductMenuResponse createProductMenu(ProductMenuRequest productMenuRequest) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByEmail(userName).orElseThrow();
+        Restaurante restaurante = usuario.getRestaurante();
 
-    @Override
-    public ProductMenuResponse verProducto(String codigoProductoMenu) {
-        return findByIdCodigo(codigoProductoMenu);
-    }
+        MenuProducto menu = getMenuEntity(productMenuRequest);
 
-    @Override
-    public void eliminarPlatoDelMenu(String codigoProductoMenu) {
-        MenuProducto menuProducto = menuProductoRepository.findById(codigoProductoMenu).orElseThrow(() -> new UsernameNotFoundException("No se logro eliminar el producto"));
-        Restaurante restauranteVinculado = menuProducto.getRestaurante();
-        restauranteVinculado.getMenuProductos().remove(menuProducto);
-        menuProductoRepository.deleteById(codigoProductoMenu);
-    }
-
-    public Restaurante restauranteByEmailUsuario(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (email == null || email.equals("anonymousUser") || email.trim().isEmpty()){
-            throw new RuntimeException("Error: El usuario no se encuentra autenticado en el sistema.");
+        if(restaurante == null){
+            throw new RuntimeException("No tiene el rol indicado para realizar esta transaccion");
         }
-        Usuario usuarioVinculadoAlRestaurante = usuarioRepository.findByEmail(email).orElseThrow();
-        return usuarioVinculadoAlRestaurante.getRestauranteByUsuario();
+
+        menu.setRestaurante(restaurante);
+
+        restauranteRepository.save(restaurante);
+        return getMenuResponse(menu);
     }
 
-    ProductMenuResponse getResponseByEntity(MenuProducto menuProducto){
-        ProductMenuResponse productMenuResponse = new ProductMenuResponse();
-        productMenuResponse.setId(menuProducto.getId());
-        productMenuResponse.setNombre(menuProducto.getProducto().getNombre());
-        productMenuResponse.setCategoria(menuProducto.getCategoria());
-        productMenuResponse.setPrecioBase(menuProducto.getPrecioBase());
-        return productMenuResponse;
+    public MenuProducto getMenuEntity(ProductMenuRequest productMenuRequest){
+        MenuProducto menu = new MenuProducto();
+        ProductoMaster productoMaster = productoRepository.findByCodigo(productMenuRequest.getCodigo());
+
+        if (productoMaster == null) {
+            throw new ExceptionMessage("Error al añadir el producto a tu empresa: ");
+        }
+
+        menu.mapeoDatos(productoMaster);
+        menu.setPrecioBase(productMenuRequest.getPrecioBase());
+        menu.setDescuento(productMenuRequest.getDescuento());
+        Double precioCalculado = productMenuRequest.getPrecioBase() - (productMenuRequest.getPrecioBase() * productMenuRequest.getDescuento());
+        menu.setPrecioFinal(precioCalculado);
+        return menu;
     }
 
-    Double calculoPrecioFinal(Double precioBase, Double descuento){
-        Double precioMostrar = descuento != null ? precioBase * (descuento/100) : precioBase;
-        return precioMostrar;
-    }
-
-    ProductMenuResponse findByIdCodigo(String codigo){
-        MenuProducto menuProducto = menuProductoRepository.findById(codigo).orElseThrow(() -> new UsernameNotFoundException("No se encontro con ese ID en el menu"));
-        return getResponseByEntity(menuProducto);
+    public ProductMenuResponse getMenuResponse(MenuProducto menuProducto){
+        ProductMenuResponse menuResponse = new ProductMenuResponse();
+        menuResponse.setId(menuProducto.getId());
+        menuResponse.setNombre(menuProducto.getProducto().getNombre());
+        menuResponse.setDescripcion(menuProducto.getDescripcion());
+        menuResponse.setPrecioBase(menuProducto.getPrecioBase());
+        menuResponse.setDescuento(menuProducto.getDescuento());
+        menuResponse.setPrecioFinal(menuProducto.getPrecioFinal());
+        return menuResponse;
     }
 
 }

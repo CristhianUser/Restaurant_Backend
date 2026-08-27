@@ -16,18 +16,20 @@ public class Restaurante {
     private Long id;
     @Column(name = "codigo_rest", unique = true)
     private String codigo = UUID.randomUUID().toString().replace("-","").substring(0,10);
-    private String ubicacion;
-    private String ubicacionURL;
-    private String nombreUnico;
+    @Column(unique = true)
+    private String rucRestaurante;
+    private String distrito;
+    private String nombreRestaurante;
+    private String ubicacionRestaurante;
     private String foto;
     @ManyToOne
     @JoinColumn(name = "sede_id")
     private Sede sede;
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MenuProducto> menuProductos = new HashSet<>();
-    @OneToMany(mappedBy = "restauranteReserva")
+    @OneToMany(mappedBy = "restauranteReserva", cascade = CascadeType.ALL)
     private Set<Reservas> reservas = new HashSet<>();
-    @OneToMany(mappedBy = "restauranteByUsuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Usuario> usuarios = new HashSet<>();
 
     public void agregarAlMenu(MenuProducto menuProducto){
@@ -37,7 +39,7 @@ public class Restaurante {
 
     public void vincularUsuario(Usuario usuario){
         this.usuarios.add(usuario);
-        usuario.setRestauranteByUsuario(this);
+        usuario.setRestaurante(this);
     }
 
     public void vinculadoReservas(Reservas reservas){

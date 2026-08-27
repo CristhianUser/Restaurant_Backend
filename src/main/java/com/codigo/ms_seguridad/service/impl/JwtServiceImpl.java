@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtServiceImpl implements JwtService {
@@ -32,16 +33,24 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateToken(UserDetails userDetails, Usuario usuario) {
-        return Jwts.builder()
+        var token = Jwts.builder()
                 .setHeaderParam("typ","JWT")
                 .setClaims(addClaims(userDetails))
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 300000))
+                .setExpiration(new Date(System.currentTimeMillis() + 900000))
                 .claim("type", Constants.ACCESS)
                 .claim("Nombres",usuario.getNombres())
                 .claim("Apellidos", usuario.getApellidos())
-                .claim("dni", usuario.getNumDoc())
+                .claim("dni", usuario.getNumDoc());
+//                .signWith(getSignKey(), SignatureAlgorithm.HS512)
+//                .compact();
+
+        if(usuario.getRestaurante() != null){
+            token.claim("restaurante", usuario.getRestaurante().getCodigo());
+        }
+
+        return token
                 .signWith(getSignKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -56,7 +65,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
-                //.setClaims(extraClaims)
+                .setClaims(extraClaims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 18000000))
                 .setSubject(userDetails.getUsername())
@@ -100,7 +109,7 @@ public class JwtServiceImpl implements JwtService {
         claims.put(Constants.CLAVE_Enabled, userDetails.isEnabled());
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .toList();
+                .collect(Collectors.toList());
         claims.put("roles",roles);
         return claims;
     }

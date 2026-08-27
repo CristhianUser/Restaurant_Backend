@@ -11,9 +11,5 @@ import java.util.Set;
 public class SedeResponse {
     private String codigo;
     private String departamento;
-    private String distrito;
-    private String nombre;
-    private String ubicacion;
-    private String foto;
     private Set<RestauranteResponse> restauranteResponseSet = new HashSet<>();
 }

@@ -6,6 +6,7 @@ import com.codigo.ms_seguridad.repository.UsuarioRepository;
 import com.codigo.ms_seguridad.service.UsuariosService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,7 @@ public class UsuariosServiceImpl implements UsuariosService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(String email) {
         usuarioRepository.deleteByEmail(email);
     }

@@ -15,19 +15,9 @@ public class SedeController {
 
     public final SedeService sedeService;
 
-    @GetMapping("/all-sede")
-    private List<SedeResponse> allSedes(@RequestParam("nombre") String nombreSede){
-        return sedeService.listSedes(nombreSede);
-    }
-
-    @PostMapping("/create-sede")
-    private SedeResponse createSede(@ModelAttribute SedeRequest sedeRequest){
-        return sedeService.createSede(sedeRequest);
-    }
-
-    @GetMapping ("/sede/{codigo}")
-    private SedeResponse findSede(@PathVariable("codigo") String codigo){
-        return sedeService.findByCodigo(codigo);
+    @GetMapping("/sedes")
+    private List<SedeResponse> listSedes(@RequestParam("filtro") String filtro){
+        return sedeService.listSedeResponses(filtro);
     }
 
 }
