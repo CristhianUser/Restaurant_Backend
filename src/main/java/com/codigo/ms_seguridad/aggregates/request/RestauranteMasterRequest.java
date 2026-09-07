@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RestauranteMasterRequest {
-    private RestauranteRequest restauranteRequest;
-    private SignUpRequest signUpRequest;
+    private RestauranteRequest restaurante;
+    private SignUpRequest user;
 }

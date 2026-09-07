@@ -110,6 +110,7 @@ public class RestauranteServiceImpl implements RestauranteService {
         newRestauranteResponse.setNombreRestaurante(restaurante.getNombreRestaurante());
         newRestauranteResponse.setFotoRestaurante(restaurante.getFoto());
         newRestauranteResponse.setUbicacionRestaurante(restaurante.getUbicacionRestaurante());
+        newRestauranteResponse.setUsuariosReponsResponses(getListReponseUser(restaurante.getUsuarios()));
         newRestauranteResponse.setProductMenuResponses(getListResponse(restaurante.getMenuProductos()));
         return newRestauranteResponse;
     }
@@ -119,6 +120,15 @@ public class RestauranteServiceImpl implements RestauranteService {
         for (MenuProducto menu:productos){
             ProductMenuResponse productMenuResponse = getResponseProduct(menu);
             responses.add(productMenuResponse);
+        }
+        return responses;
+    }
+
+    public Set<DataResponse> getListReponseUser(Set<Usuario> usuarios){
+        Set<DataResponse> responses = new HashSet<>();
+        for (Usuario usu:usuarios){
+            DataResponse dataUsuario = getResponseUsuario(usu);
+            responses.add(dataUsuario);
         }
         return responses;
     }
@@ -135,5 +145,12 @@ public class RestauranteServiceImpl implements RestauranteService {
         return productMenuResponse;
     }
 
+    public DataResponse getResponseUsuario(Usuario usuario){
+        return DataResponse.builder()
+                .email(usuario.getEmail())
+                .nombres(usuario.getNombres()+' '+ usuario.getApellidos())
+                .roles(usuario.getRoles().stream().map(rol -> rol.getNombreRol()).collect(Collectors.toList()))
+                .build();
+    }
 
 }

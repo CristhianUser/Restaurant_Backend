@@ -12,5 +12,4 @@ public class RestauranteRequest {
     private String rucRestaurante;
     private String nombreRestaurante;
     private String ubicacionRestaurante;
-    private MultipartFile fotoRestaurante;
 }

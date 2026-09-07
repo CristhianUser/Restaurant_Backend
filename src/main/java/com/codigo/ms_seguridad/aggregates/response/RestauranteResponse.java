@@ -14,7 +14,7 @@ public class RestauranteResponse {
     private String rucRestaurante;
     private String nombreRestaurante;
     private String fotoRestaurante;
-    private String ubicacionRestaurante;
+        private String ubicacionRestaurante;
     private Set<DataResponse> usuariosReponsResponses = new HashSet<>();
     private Set<ProductMenuResponse> productMenuResponses= new HashSet<>();
 }

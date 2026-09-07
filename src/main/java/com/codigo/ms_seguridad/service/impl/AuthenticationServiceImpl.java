@@ -72,22 +72,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void singUpGestorRestaurante(RestauranteMasterRequest restauranteMasterRequest) {
 
-        boolean emailPresent = usuarioRepository.existsByEmail(restauranteMasterRequest.getSignUpRequest().getEmail());
+        boolean emailPresent = usuarioRepository.existsByEmail(restauranteMasterRequest.getUser().getEmail());
 
-        boolean rucPresent = restauranteRepository.existsByRucRestaurante(restauranteMasterRequest.getRestauranteRequest().getRucRestaurante());
+        boolean rucPresent = restauranteRepository.existsByRucRestaurante(restauranteMasterRequest.getRestaurante().getRucRestaurante());
+
+        boolean sedePresent = sedeRepository.existsByDepartamento(restauranteMasterRequest.getRestaurante().getDepartamento());
 
         if (rucPresent || emailPresent){
             throw new ExceptionMessage("El ruc o el email ya se encuentra registrado !!!");
         }
 
-        Usuario usuario = getUsuarioEntity(restauranteMasterRequest.getSignUpRequest());
+        Sede sede;
+
+        if(sedePresent){
+            sede = sedeRepository.findByDepartamento(restauranteMasterRequest.getRestaurante().getDepartamento());
+        }else {
+            sede = getSede(restauranteMasterRequest.getRestaurante().getDepartamento());
+        }
+
+        Usuario usuario = getUsuarioEntity(restauranteMasterRequest.getUser());
         usuario.setRoles(Collections.singleton(getRoles(Role.GESTOR_RESTAURANTE)));
-        Sede sede = getSede(restauranteMasterRequest.getRestauranteRequest().getDepartamento());
         Restaurante restaurante = getRestaurante(
-                    restauranteMasterRequest.getRestauranteRequest().getRucRestaurante(),
-                    restauranteMasterRequest.getRestauranteRequest().getNombreRestaurante(),
-                    restauranteMasterRequest.getRestauranteRequest().getUbicacionRestaurante(),
-                    restauranteMasterRequest.getRestauranteRequest().getDistrito()
+                    restauranteMasterRequest.getRestaurante().getRucRestaurante(),
+                    restauranteMasterRequest.getRestaurante().getNombreRestaurante(),
+                    restauranteMasterRequest.getRestaurante().getUbicacionRestaurante(),
+                    restauranteMasterRequest.getRestaurante().getDistrito()
                 );
         sede.AsociarRestaurante(restaurante);
         restaurante.vincularUsuario(usuario);
